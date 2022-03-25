@@ -11,11 +11,9 @@ public static class DotEnv
 			return;
 		}
 			
-
 		foreach (var line in File.ReadAllLines(file_path))
         {
 			var parts = line.Split("=", StringSplitOptions.RemoveEmptyEntries);
-			
 			if (parts.Length != 2)
 				continue;
 
