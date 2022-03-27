@@ -1,25 +1,27 @@
 ﻿using System;
 using System.IO;
+using System.Collections.Generic;
+
 using MySql.Data.MySqlClient;
 
 namespace food_expenses_and_tracking
 {
     class MySQL_handler
     {
-        public static void load_data_from_file()
+        public static Dictionary<string, string> load_data_from_file()
         {
             string root_path = "E:\\Programming\\projects\\C#\\food_expenses_and_tracking";
             var dotenv = Path.Combine(root_path, "info.env");
-            DotEnv.Load(dotenv);
+            return DotEnv.Load(dotenv);
         }
-        public MySqlConnection initialize_conn()
+        public MySqlConnection initialize_conn(Dictionary<string, string> sql_data)
         {
-            string server = Environment.GetEnvironmentVariable("server");
-            string database = Environment.GetEnvironmentVariable("database");
-            string uid = Environment.GetEnvironmentVariable("uid");
-            string pass = Environment.GetEnvironmentVariable("pass");
-            string port = Environment.GetEnvironmentVariable("port");
-            string ssl = Environment.GetEnvironmentVariable("ssl");
+            string server = sql_data["server"];
+            string database = sql_data["database"];
+            string uid = sql_data["uid"];
+            string pass = sql_data["pass"];
+            string port = sql_data["port"];
+            string ssl = sql_data["ssl"];
 
             string conn_string = String.Format("server={0};port={4};database={1};Uid={2};Pwd={3};SslMode={5};", 
                                                 server, database, uid, pass, port, ssl);
@@ -85,9 +87,8 @@ namespace food_expenses_and_tracking
         static void Main(string[] args)
         {
             MySQL_handler sql_obj = new MySQL_handler();
-            MySQL_handler.load_data_from_file();
-
-            MySqlConnection conn = sql_obj.initialize_conn();
+            
+            MySqlConnection conn = sql_obj.initialize_conn(MySQL_handler.load_data_from_file());
             bool conn_check_bool = sql_obj.open_conn(conn);
             if (conn_check_bool)
             {
