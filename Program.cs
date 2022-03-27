@@ -8,6 +8,7 @@ namespace food_expenses_and_tracking
 {
     class MySQL_handler
     {
+        MySqlConnection conn;
         public static Dictionary<string, string> load_data_from_file()
         {
             string root_path = "E:\\Programming\\projects\\C#\\food_expenses_and_tracking";
@@ -26,8 +27,8 @@ namespace food_expenses_and_tracking
             string conn_string = String.Format("server={0};port={4};database={1};Uid={2};Pwd={3};SslMode={5};", 
                                                 server, database, uid, pass, port, ssl);
 
-            MySqlConnection conn = new MySqlConnection(conn_string);
-            return conn;
+            this.conn = new MySqlConnection(conn_string);
+            return this.conn;
         }
 
         public bool open_conn(MySqlConnection conn)
@@ -63,6 +64,32 @@ namespace food_expenses_and_tracking
             {
                 Console.WriteLine(query_result[0]);
             }
+            query_result.Close();
+        }
+
+        public void insert_ingredient_data(MySqlConnection conn)
+        {
+            DateTime local_date = DateTime.Now;
+            string converted_date = local_date.ToString("yyyy-MM-dd");
+            Console.WriteLine(converted_date);
+
+            string query = "INSERT INTO ingredient_prices (ingredient_name, ingredient_price, location, date_recorded) VALUES (?ingredient_name, ?ingredient_price, ?location, ?date_recorded);";
+            MySqlCommand command = new MySqlCommand(query, conn);
+            command.Parameters.Add(new MySqlParameter("ingredient_name", "Gallon Water"));
+            command.Parameters.Add(new MySqlParameter("ingredient_price", 0.95));
+            command.Parameters.Add(new MySqlParameter("location", "Aldi"));
+            command.Parameters.Add(new MySqlParameter("date_recorded", converted_date));
+            MySqlDataReader cmd = command.ExecuteReader();
+            cmd.Close();
+
+            /*
+             Tab for each item (i.e. inserting ingredients, recipes, prices, etc.) 
+             
+             Make UI to insert ingredients (we will add an auto-incrementer in code, that can be overridden).
+                Type in name and insert button?
+                2 textboxes, one for name and one for #, and insert button, display inserted foods in grid below?
+                    Add a third textbox for it's price? Fourth textbox for location, Fifth checkbox for if we have it stored or not?
+             */
         }
 
         public bool close_connection(MySqlConnection conn)
@@ -93,6 +120,7 @@ namespace food_expenses_and_tracking
             if (conn_check_bool)
             {
                 sql_obj.get_tables(conn);
+                sql_obj.insert_ingredient_data(conn);
                 sql_obj.close_connection(conn);
             }
         }
